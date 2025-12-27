@@ -6,6 +6,75 @@
 
 This repository consolidates IoT and embedded systems projects, focusing on ESP32, OpenWrt, and related technologies.
 
+## 🏗️ Architecture
+
+### ESP32-OpenWrt Communication Flow
+
+```mermaid
+graph TB
+    subgraph "ESP32 Device"
+        ESP[ESP32-MDF<br/>Mesh Network]
+        ESP_DATA[ESP Data Collection<br/>MAC Address, Messages]
+    end
+    
+    subgraph "OpenWrt Router"
+        SOCKET[Socket Server<br/>socket_server.py<br/>Port: 8070]
+        DATA_DIR[Data Directory<br/>data/*.txt]
+        IPFS_CLIENT[IPFS Client<br/>ipfs_http_client.py]
+    end
+    
+    subgraph "IPFS Network"
+        IPFS_DAEMON[IPFS Daemon<br/>Local Node]
+        IPFS_GATEWAY[IPFS Gateway<br/>Public/Private]
+        IPFS_HASH[IPFS Hash<br/>Qm...]
+    end
+    
+    ESP -->|Socket Connection<br/>TCP/IP| SOCKET
+    ESP_DATA --> ESP
+    SOCKET -->|Save Data| DATA_DIR
+    DATA_DIR -->|Upload Files| IPFS_CLIENT
+    IPFS_CLIENT -->|Add to IPFS| IPFS_DAEMON
+    IPFS_DAEMON -->|Generate Hash| IPFS_HASH
+    IPFS_DAEMON <-->|P2P Network| IPFS_GATEWAY
+    
+    style ESP fill:#e1f5ff
+    style SOCKET fill:#fff4e1
+    style IPFS_DAEMON fill:#e8f5e9
+    style IPFS_HASH fill:#f3e5f5
+```
+
+### System Architecture
+
+```mermaid
+graph LR
+    subgraph "Hardware Layer"
+        ESP32[ESP32 Board<br/>ESP-MDF]
+        OPENWRT[OpenWrt Device<br/>Raspberry Pi]
+    end
+    
+    subgraph "Application Layer"
+        PYTHON[Python 3.x<br/>Applications]
+        SOCKET_APP[Socket Server]
+        IPFS_APP[IPFS Client]
+    end
+    
+    subgraph "Storage Layer"
+        LOCAL[Local Storage<br/>Text Files]
+        IPFS_STORAGE[IPFS Network<br/>Distributed Storage]
+    end
+    
+    ESP32 -->|WiFi/Ethernet| OPENWRT
+    OPENWRT --> PYTHON
+    PYTHON --> SOCKET_APP
+    PYTHON --> IPFS_APP
+    SOCKET_APP --> LOCAL
+    IPFS_APP --> IPFS_STORAGE
+    
+    style ESP32 fill:#e1f5ff
+    style OPENWRT fill:#fff4e1
+    style IPFS_STORAGE fill:#e8f5e9
+```
+
 ## 📁 Projects
 
 ### [esp32-openwrt](./esp32-openwrt/)
